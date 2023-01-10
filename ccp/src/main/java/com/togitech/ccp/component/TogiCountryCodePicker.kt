@@ -72,6 +72,7 @@ fun TogiCountryCodePicker(
                     visualTransformation = PhoneNumberTransformation(defaultCountry.countryCode.uppercase()),
                     placeholder = { Text(text = stringResource(id = getNumberHint(defaultCountry.countryCode))) },
                     keyboardOptions = KeyboardOptions.Default.copy(
+                        autoCorrect = true,
                         keyboardType = KeyboardType.NumberPassword,
                     ),
                     keyboardActions = KeyboardActions(onDone = { keyboardController?.hideSoftwareKeyboard() }),
@@ -93,11 +94,10 @@ fun TogiCountryCodePicker(
                     trailingIcon = {
                         if (!error)
                             Icon(
-                                imageVector = Icons.Filled.Warning,
-                                contentDescription = "Error",
+                                imageVector = Icons.Filled.Warning, contentDescription = "Error",
                                 tint = MaterialTheme.colors.error
                             )
-                    },
+                    }
                 )
                 if (!error)
                     Text(
