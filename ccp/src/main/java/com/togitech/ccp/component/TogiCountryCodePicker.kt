@@ -23,66 +23,97 @@ import com.togitech.ccp.transformation.PhoneNumberTransformation
 
 @Composable
 fun TogiCountryCodePicker(
-        text: String,
-        onValueChange: (String) -> Unit,
-        modifier: Modifier = Modifier,
-        color: Color = MaterialTheme.colors.background,
-        showCountryCode: Boolean = true,
-        defaultCountry: CountryData,
-        pickedCountry: (CountryData) -> Unit,
-        focusedBorderColor: Color = MaterialTheme.colors.primary,
-        unfocusedBorderColor: Color = MaterialTheme.colors.onSecondary,
-        cursorColor: Color = MaterialTheme.colors.primary,
-        dialogAppBarColor: Color = MaterialTheme.colors.primary,
-        dialogAppBarTextColor: Color = Color.White,
-        error: Boolean,
-        rowPadding: Modifier = modifier.padding(vertical = 16.dp, horizontal = 16.dp)
+    text: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colors.background,
+    showCountryCode: Boolean = true,
+    defaultCountry: CountryData,
+    pickedCountry: (CountryData) -> Unit,
+    focusedBorderColor: Color = MaterialTheme.colors.primary,
+    unfocusedBorderColor: Color = MaterialTheme.colors.onSecondary,
+    cursorColor: Color = MaterialTheme.colors.primary,
+    dialogAppBarColor: Color = MaterialTheme.colors.primary,
+    dialogAppBarTextColor: Color = Color.White,
+    error: Boolean,
+    rowPadding: Modifier = modifier.padding(vertical = 16.dp, horizontal = 16.dp)
 ) {
     var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = text)) }
     val textFieldValue = textFieldValueState.copy(text = text)
     val keyboardController = LocalTextInputService.current
-    Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-    )
-    {
-        OutlinedTextField(
-                modifier = modifier
-                        .fillMaxWidth(),
+    Surface(
+        color = color
+    ) {
+        Column(
+            modifier = rowPadding
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            )
+            {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                )
+                {
+                    OutlinedTextField(
+                        modifier = modifier
+                            .fillMaxWidth(),
 
-                value = textFieldValue,
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = if (!error) Color.Red else focusedBorderColor,
-                        unfocusedBorderColor = if (!error) Color.Red else unfocusedBorderColor,
-                        cursorColor = cursorColor
-                ),
-                onValueChange = {
-                    textFieldValueState = it
-                    if (text != it.text) {
-                        onValueChange(it.text)
-                    }
-                },
-                singleLine = true,
-                placeholder = { Text(text = stringResource(id = getNumberHint(defaultCountry.countryCode))) },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.NumberPassword,
-                ),
-                keyboardActions = KeyboardActions(onDone = { keyboardController?.hideSoftwareKeyboard() }),
-                leadingIcon = {
-                    Row {
-                        Column {
-                            val dialog = TogiCodePicker()
-                            dialog.TogiCodeDialog(
-                                    pickedCountry = pickedCountry,
-                                    defaultSelectedCountry = defaultCountry,
-                                    dialogAppBarColor = dialogAppBarColor,
-                                    showCountryCode = showCountryCode,
-                                    dialogAppBarTextColor = dialogAppBarTextColor
-                            )
-                        }
+                        value = textFieldValue,
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = if (!error) Color.Red else focusedBorderColor,
+                            unfocusedBorderColor = if (!error) Color.Red else unfocusedBorderColor,
+                            cursorColor = cursorColor
+                        ),
+                        onValueChange = {
+                            textFieldValueState = it
+                            if (text != it.text) {
+                                onValueChange(it.text)
+                            }
+                        },
+                        singleLine = true,
+                        visualTransformation = PhoneNumberTransformation(defaultCountry.countryCode.uppercase()),
+                        placeholder = { Text(text = stringResource(id = getNumberHint(defaultCountry.countryCode))) },
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.NumberPassword,
+                        ),
+                        keyboardActions = KeyboardActions(onDone = { keyboardController?.hideSoftwareKeyboard() }),
+                        leadingIcon = {
+                            Row {
+                                Column {
+                                    val dialog = TogiCodePicker()
+                                    dialog.TogiCodeDialog(
+                                        pickedCountry = pickedCountry,
+                                        defaultSelectedCountry = defaultCountry,
+                                        dialogAppBarColor = dialogAppBarColor,
+                                        showCountryCode = showCountryCode,
+                                        dialogAppBarTextColor = dialogAppBarTextColor
+                                    )
+                                }
 
-                    }
-                },
-        )
+                            }
+                        },
+                        trailingIcon = {
+                            if (!error)
+                                Icon(
+                                    imageVector = Icons.Filled.Warning,
+                                    contentDescription = "Error",
+                                    tint = MaterialTheme.colors.error
+                                )
+                        },
+                    )
+                    if (!error)
+                        Text(
+                            text = stringResource(id = R.string.invalid_number),
+                            color = MaterialTheme.colors.error,
+                            style = MaterialTheme.typography.caption,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = 0.8.dp)
+                        )
+                }
+            }
+        }
     }
 }
